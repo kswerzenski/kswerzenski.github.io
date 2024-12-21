@@ -5,7 +5,7 @@ The last few years have brought significant changes to just about every industry
 
 
 ## Data Sources and Relationships
-The three data sources I chose are as follows: 
+The three data sources used for this project are as follows: 
 
 Flat File (.csv): https://www.kaggle.com/datasets/shivamb/netflix-shows 
 

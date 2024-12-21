@@ -6,6 +6,7 @@ The last few years have brought significant changes to just about every industry
 
 ## Data Sources and Relationships
 The three data sources I chose are as follows: 
+
 Flat File (.csv): https://www.kaggle.com/datasets/shivamb/netflix-shows 
 
 The flat file data set contains a list of television shows and movies that are on the streaming service Netflix, including their original release dates and the date that they were added to streaming. Similar data sets also exist for Amazon Prime Video, Hulu, and Disney+ which I also plan to leverage in this project. 

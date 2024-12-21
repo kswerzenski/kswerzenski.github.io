@@ -1,10 +1,10 @@
 # Predicting Film Success in a Rapidly Changing Industry
 
-## Intro
+## About
 The last few years have brought significant changes to just about every industry, but perhaps one of the most well-known and rapidly changing industries continues to be the film industry. With challenges presented by the COVID-19 pandemic severely impacting theater attendance, along with the rapid increase and availability of content on streaming services, the film industry looks much different today than it ever has in the past which has led to significant unpredictability in how well a film will perform. For this project, I plan to gather data on films released in the last 5-10 years amidst some of these huge changes (both within the industry and with people’s behaviors in consuming films) to see what factors could potentially predict a film’s success in this new landscape. 
 
 
-## Data Sources and Relationships
+## Data Sources
 The three data sources used for this project are as follows: 
 
 Flat File (.csv): https://www.kaggle.com/datasets/shivamb/netflix-shows 

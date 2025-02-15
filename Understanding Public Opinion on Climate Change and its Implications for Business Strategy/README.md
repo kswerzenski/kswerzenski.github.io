@@ -10,3 +10,15 @@ Understanding public perceptions of climate change is crucial to develop effecti
 
 ## Data Sources
 For this project investigating the public’s feelings towards funding research on renewable energy resources, data from the Yale Program on Climate Change Communication’s Climate Change in the American Mind National Survey was utilized which contains thousands of survey responses from Americans from 2008-2022 about their opinions and behaviors regarding climate change. The data was obtained directly from Yale University’s School of the Environment by request.
+
+### References
+Anderson, A. (2017). Public Perception of Climate Change: Factors, Impacts, and Strategies. Annual Review of Environment and Resources, 42(1), 113-135. doi:10.1146/annurev-environ-102016-060653.
+
+Ballew, M. T., Leiserowitz, A., Roser-Renouf, C., Rosenthal, S. A., Kotcher, J. E., Marlon, J. R., Lyon, E., Goldberg, M. H., & Maibach, E. W. (2019). Climate Change in the American Mind: Data, tools, and trends. Environment: Science and Policy for Sustainable Development, 61(3), 4-18. doi: 10.1080/00139157.2019.1589300
+
+EUROPARC (2024.). EU 2030 Biodiversity Strategy. EUROPARC Federation. https://www.europarc.org/european-policy/eu-biodiversity-strategy-protected-areas/eu-2030-biodiversity-strategy/#:~:text=The%20EU%202030%20Biodiversity%20Strategy%20sets%20the%20following%20targets
+
+Foley, M. (2024). Businesses Scramble As Global Regulators Set Their Sights On Biodiversity Impacts. Forbes. Retrieved June 1, 2024, from https://www.forbes.com/sites/maryfoley/2024/02/21/businesses-scramble-as-global-regulators-set-their-sights-on-biodiversity-impacts/?sh=34f110bb3534
+Porter, M. E., & Reinhardt, F. L. (2019, November 23). Climate Business | Business Climate. Harvard Business Review. https://hbr.org/2007/10/climate-business-_-business-climate
+
+Yale Program on Climate Change Communication (YPCCC) & George Mason University Center for Climate Change Communication (Mason 4C). (2024). Climate Change in the American Mind: National survey data on public opinion (2008-2023) [Data file and codebook]. doi: 10.17605/OSF.IO/JW79P

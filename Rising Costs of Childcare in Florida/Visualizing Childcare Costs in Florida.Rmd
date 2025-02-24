@@ -1,0 +1,371 @@
+---
+title: "Final_Project_Visualizations"
+output: html_document
+date: "2024-10-05"
+---
+```{r}
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+library(scales)
+library(plotly)
+```
+```{r}
+list.files()
+```
+
+
+```{r}
+states_data <- read.csv("national_childcare.csv")
+head(states_data)
+```
+```{r}
+valid_data <- states_data %>%
+  filter(!is.na(MCInfant) & !is.na(MCPreschool) & !is.na(MCToddler) & !is.na(MCSA))
+```
+
+```{r}
+most_recent_valid_data <- valid_data %>%
+  group_by(State_Name, County_Name) %>%
+  filter(StudyYear == max(StudyYear)) %>%  # Get the most recent year for each county
+  ungroup()
+```
+
+```{r}
+most_recent_data <- most_recent_valid_data %>%
+  mutate(avg_cost = rowMeans(select(., MCInfant, MCPreschool, MCToddler, MCSA), na.rm = TRUE))
+print(most_recent_data)
+```
+```{r}
+fl_data_county <- most_recent_data %>%
+  filter(State_Name == "Florida")
+print(fl_data_county)
+```
+
+```{r}
+state_avg_costs <- most_recent_data %>%
+  group_by(State_Name) %>%
+  summarize(avg_cost = mean(avg_cost, na.rm = TRUE)) %>%
+  arrange(desc(avg_cost))
+```
+
+
+```{r}
+top_states <- state_avg_costs %>%
+  top_n(15, avg_cost) %>%
+  bind_rows(state_avg_costs %>% filter(State_Name == "Florida"))
+```
+
+```{r}
+florida_data <- state_avg_costs %>% filter(State_Name == "Florida")
+print(florida_data)
+```
+
+```{r}
+avg_childcare <- ggplot(state_avg_costs, aes(x = reorder(State_Name, avg_cost), y = avg_cost, fill = State_Name == "Florida")) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("gray", "lightblue"), guide = "none") +  # Highlight Florida
+  labs(title = "Average Childcare Costs Across the US",
+       subtitle = "How does Florida compare to the nation?",
+       x = "State",
+       y = "Average Weekly Childcare Cost ($)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),  # Center and bold title
+    plot.subtitle = element_text(hjust = 0.5, size = 12),  # Center subtitle
+    axis.title = element_text(size = 14),  # Increase axis title size
+    axis.text = element_text(size = 12),  # Increase axis text size
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    legend.position = "none"  # Remove legend if not needed
+  )
+
+ggsave("Florida vs Country Avg Childcare.jpg", plot = avg_childcare, width = 15, height = 10)
+```
+
+```{r}
+florida_county_dist <- ggplot(fl_data_county, aes(x = avg_cost)) +
+  geom_histogram(bins = 10, fill = "lightblue", color = "#FFFFFF") +  # Keep light blue color and white outlines
+  scale_x_continuous(labels = dollar) +  # Format x-axis labels as currency
+  scale_y_continuous(breaks = seq(0, max(fl_data_county$avg_cost), by = 1)) +  # Adjust y-axis breaks for clarity
+  labs(x = "Average Weekly Childcare Cost ($)",
+       y = "Number of Counties") +
+  theme_minimal(base_size = 14) +  # Increase base font size for better readability
+  theme(
+    axis.title.x = element_text(size = 30, face = "bold"),  # Increase size for x-axis title
+    axis.title.y = element_text(size = 30, face = "bold"),  # Increase size for y-axis title
+    axis.text.x = element_text(size = 24),  # Increase size for x-axis tick marks
+    axis.text.y = element_text(size = 24),  # Increase size for y-axis tick marks
+    panel.grid.major.x = element_blank(),  # Remove vertical grid lines for a cleaner look
+    panel.grid.minor.x = element_blank(),  # Remove minor vertical grid lines
+    panel.grid.major.y = element_line(color = "lightgrey"),  # Keep light grey horizontal grid lines
+    panel.grid.minor.y = element_blank()   # Remove minor horizontal grid lines
+  )
+print(florida_county_dist)
+ggsave("Florida County Avg Cost Dist.jpg", plot = florida_county_dist, width = 20, height = 10)
+```
+
+```{r}
+fl_data <- valid_data %>%
+  filter(State_Name == "Florida") %>%
+  mutate(avg_cost = rowMeans(select(., MCInfant, MCPreschool, MCToddler, MCSA), na.rm = TRUE))
+```
+
+```{r}
+rate_of_change <- fl_data %>%
+  group_by(County_Name) %>%
+  summarise(
+    earliest_cost = avg_cost[which.min(StudyYear)],
+    earliest_year = StudyYear[which.min(StudyYear)],  # Add the earliest year
+    most_recent_cost = avg_cost[which.max(StudyYear)],
+    most_recent_year = StudyYear[which.max(StudyYear)],  # Add the most recent year
+    rate_change = (most_recent_cost - earliest_cost) / earliest_cost * 100  # Percentage change
+  )
+print(rate_of_change)
+```
+```{r}
+top_counties <- rate_of_change %>%
+  arrange(desc(rate_change)) %>%
+  slice(1:5) %>%
+  pull(County_Name)
+```
+
+```{r}
+fl_data_selected <- fl_data %>%
+  filter(County_Name %in% top_counties)
+```
+
+
+```{r}
+ggplot(fl_data_selected, aes(x = StudyYear, y = avg_cost, group = County_Name)) +
+  geom_line(aes(color = County_Name == top_counties[1]), size = 1) +  # Highlight the top county
+  scale_color_manual(values = c("grey89", "#41b8d5"), 
+                     labels = c("Other Top Counties", top_counties[1])) +  # Lighter grey for other counties
+  labs(title = "Top 5 Counties in Florida by Rate of Change in Childcare Costs",
+       x = "Year",
+       y = "Average Childcare Cost ($)",
+       color = "County") +
+  theme_minimal(base_size = 14) +  # Increase base font size
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),  # Bold x-axis title
+    axis.title.y = element_text(size = 14, face = "bold"),  # Bold y-axis title
+    panel.grid.major.x = element_blank(),  # Remove vertical grid lines for a cleaner look
+    panel.grid.minor.x = element_blank(),  # Remove minor vertical grid lines
+    panel.grid.major.y = element_line(color = "lightgrey"),  # Keep light grey horizontal grid lines
+    panel.grid.minor.y = element_blank()   # Remove minor horizontal grid lines
+  )
+```
+```{r}
+blues_palette <- brewer.pal(5, "Blues")
+
+# Get the county with the highest rate of change
+highest_change_county <- top_counties[1]
+
+# Create a mapping for the counties, ensuring the highest change county is the darkest
+county_mapping <- setNames(blues_palette[c(1, 2, 3, 4, 5)], top_counties)  # Assign lighter blues first
+
+# Make the highest change county the darkest blue
+county_mapping[highest_change_county] <- "#004B87"  # Darkest blue for the county with the highest change
+
+# Create the plot
+fl_change <- ggplot(fl_data_selected, aes(x = StudyYear, y = avg_cost, group = County_Name, color = County_Name)) +
+  geom_line(size = 1) +  # Lines for each county
+  geom_point(size = 2) +  # Points for clarity
+  scale_color_manual(values = county_mapping) +  # Apply custom color mapping
+  labs(
+       x = "Year",
+       y = "Average Childcare Cost ($)",
+       color = "County") +
+  theme_minimal(base_size = 20) +  # Increase base font size
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),  # Bold x-axis title
+    axis.title.y = element_text(size = 14, face = "bold"),  # Bold y-axis title
+    panel.grid.major.x = element_blank(),  # Remove vertical grid lines for a cleaner look
+    panel.grid.minor.x = element_blank(),  # Remove minor vertical grid lines
+    panel.grid.major.y = element_line(color = "lightgrey"),  # Keep light grey horizontal grid lines
+    panel.grid.minor.y = element_blank()   # Remove minor horizontal grid lines
+  )
+
+ggsave("FL Rate of change.jpg", plot = fl_change, width = 8, height = 5)
+
+```
+
+```{r}
+fl_data_filtered <- fl_data %>%
+  filter(StudyYear %in% c(2008, 2017))
+
+print(fl_data_filtered)
+```
+```{r}
+# Calculate the rate of change in median household income
+income_rate_of_change <- fl_data_filtered %>%
+  group_by(County_Name) %>%  # Group by County_Name to isolate each county's data
+  summarise(
+    income_2008 = first(MHI[StudyYear == 2008]),  # Get MHI for 2008
+    income_2017 = first(MHI[StudyYear == 2017]),  # Get MHI for 2017
+    rate_change_income = (income_2017 - income_2008) / income_2008 * 100  # Calculate rate of change
+  )
+```
+
+```{r}
+rate_of_change <- rate_of_change %>%
+  left_join(income_rate_of_change, by = "County_Name")
+
+print(rate_of_change)
+```
+```{r}
+change_diff <- rate_of_change %>%
+  mutate(disparity = rate_change - rate_change_income)
+```
+
+```{r}
+# Filter out counties with no disparity
+change_diff_filtered <- change_diff %>%
+  filter(disparity != 0)
+```
+
+```{r}
+diverging_bar <- ggplot(change_diff_filtered, aes(x = reorder(County_Name, disparity), y = disparity, fill = disparity > 0)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +  # Flip the chart for better readability
+  scale_fill_manual(values = c("TRUE" = "lightblue", "FALSE" = "lightgrey"), 
+                    name = "Disparity", 
+                    labels = c("Income Growth > Childcare Cost Growth", "Childcare Cost Growth > Income Growth")) +
+  labs(
+    title = "Where are Childcare Cost Increases Outpacing Income Increases the Most?",
+    x = "County",
+    y = "Disparity in Growth (%)",
+    caption = "Positive values indicate childcare cost growth outpacing income growth"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 35),  # Increase title size
+    axis.title.x = element_text(face = "bold", size=14),
+    axis.title.y = element_text(face="bold", size = 14),
+    axis.text.y = element_text(size = 16),
+    axis.text.x = element_text(size=16),
+    legend.position = "top",
+    legend.title = element_text(face = "bold", size=14)
+  )
+
+ggsave("Disparity.jpg", plot = diverging_bar, width = 20, height = 20)
+```
+
+```{r}
+combined_data <- rate_of_change %>%
+  mutate(outpaced_income = rate_change > rate_change_income)
+
+# Count how many counties have childcare cost increases outpacing income increases
+outpaced_count <- sum(combined_data$outpaced_income, na.rm = TRUE)
+
+print(outpaced_count)
+```
+
+
+
+
+```{r}
+gauge <- plot_ly(
+  type = "indicator",
+  mode = "gauge+number",
+  value = outpaced_count,  # Set the value to the count of counties
+  title = list(text = "Counties Where Childcare Costs Outpaced Income Growth"),
+  gauge = list(
+    axis = list(range = c(0, length(unique(rate_of_change$County_Name)))),  # Set range from 0 to total number of counties
+    bar = list(color = "lightblue"),  # Set the color of the gauge bar
+    steps = list(
+      list(range = c(0, length(unique(rate_of_change$County_Name)) * 0.5), color = "lightgrey"),  # Lower half range
+      list(range = c(length(unique(rate_of_change$County_Name)) * 0.5, length(unique(rate_of_change$County_Name))), color = "blue")  # Upper half range
+    )
+  )
+)
+
+# Show the plot
+gauge
+```
+
+```{r}
+gauge <- plot_ly(
+  type = "indicator",
+  mode = "gauge+number",
+  value = outpaced_count,
+  title = list(text = "Counties Where Childcare Costs Outpaced Income Growth"),
+  number = list(suffix = paste0(" out of ", length(unique(rate_of_change$County_Name)))),  # Customize the number display
+  gauge = list(
+    axis = list(range = c(0, length(unique(rate_of_change$County_Name)))),
+    bar = list(color = "lightblue")
+  )
+)
+
+# Show the plot
+gauge
+```
+
+
+
+```{r}
+states_data <- states_data %>%
+  mutate(Average_Childcare_Cost = rowMeans(select(., MCInfant, MCPreschool, MCToddler, MCSA), na.rm = TRUE))
+head(states_data)
+```
+
+```{r}
+average_data <- states_data %>%
+  group_by(State_Name, StudyYear) %>%  # Group by state and year
+  summarise(
+    Average_Childcare_Cost = mean(Average_Childcare_Cost, na.rm = TRUE),  # Average ignoring NA values
+    Average_MHI = mean(MHI, na.rm = TRUE),  # Assuming MHI is the column for median household income
+    .groups = 'drop'  # Ungroup after summarizing
+  )
+
+average_data
+```
+
+
+```{r}
+filtered_data_state_averages <- states_data %>%
+  filter(!is.na(MCInfant) & !is.na(MCPreschool) & 
+         !is.na(MCToddler) & !is.na(MCSA) & !is.na(MHI)) %>%  # Remove rows with missing values in specified columns
+  group_by(County_Name) %>%  # Group by county
+  slice_max(StudyYear) %>%  # Select the row with the most recent year for each county
+  ungroup()
+
+print(filtered_data_state_averages)
+```
+
+```{r}
+averages_by_state <- filtered_data_state_averages %>%
+  group_by(State_Name) %>%  # Group by state name and abbreviation
+  summarise(
+    avg_MCInfant = mean(MCInfant, na.rm = TRUE),   # Average for Infant Care
+    avg_MCPreschool = mean(MCPreschool, na.rm = TRUE),  # Average for Preschool Care
+    avg_MCToddler = mean(MCToddler, na.rm = TRUE),  # Average for Toddler Care
+    avg_MCSA = mean(MCSA, na.rm = TRUE),            # Average for School-Aged Care
+    avg_MHI = mean(MHI, na.rm = TRUE), 
+    avg_totalcare = mean(Average_Childcare_Cost, n.rm = TRUE), # Average for Median Household Income
+    .groups = 'drop'  # Ungroup the results
+  )
+
+# Display the averages
+print(averages_by_state)
+```
+
+```{r}
+median_income <- ggplot(averages_by_state, aes(x = avg_totalcare, y = avg_MHI)) +
+  geom_point(aes(color = ifelse(State_Name == "Florida", "Florida", "Other States")), size = 3) +  # Color based on state
+  scale_color_manual(values = c("Florida" = "skyblue", "Other States" = "grey")) +  # Set colors for Florida and other states
+  labs(
+    title = "Average Median Household Income vs. Average Total Childcare Costs by State",
+    x = "Average Total Childcare Costs ($)",
+    y = "Average Median Household Income ($)",
+    color = "State"
+  ) +
+  theme_minimal() +  # Use a minimal theme for cleaner visuals
+  geom_smooth(method = "lm", se = FALSE, color = "darkgrey")
+
+ggsave("Median Incomes.jpg", plot = median_income, width = 8, height = 5)
+
+```
+
+

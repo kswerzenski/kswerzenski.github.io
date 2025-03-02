@@ -1,13 +1,22 @@
-## Predictive Analytics for Flight Delays Enhancing Airline Efficiency and Passenger Experience
+# Predictive Analytics for Flight Delays Enhancing Airline Efficiency and Passenger Experience
 
-### About
+## About
 Air travel is one of the most time consuming and stressful forms of transportation in modern society. Between long security wait times, crowded terminals, and skyrocketing flight prices, passengers are facing more and more challenges that turn what should be a simple trip into a large ordeal. Of these challenges, perhaps the most frustrating and inconveniencing for passengers and airlines alike are flight delays, which disrupt schedules and cause cascades of issues both for travelers and the airlines. In fact, the US Department of Transportation estimates that flight delays alone cost the US economy over $30 billion and affect millions of passengers annually (Anupkumar 2023). Delays can be caused by a variety of factors including adverse weather, mechanical failures, air traffic control issues, and flight crew availabilities, making them difficult to anticipate due to the complexity and interdependence of these variables.
 
 Understanding the major causes of flight delays and seeking out patterns behind how often and why they occur can provide valuable insights both for airlines and passengers. By finding ways to predict the risk of a flight delay or cancellation, airlines could optimize flight schedules to reduce potential losses and passengers could make more informed booking decisions to reduce their risk of having their travel plans interrupted. This project will seek to leverage historical flight data and machine learning techniques to develop a predictive model that can forecast flight delays with greater accuracy by seeking out patterns and identifying key delay predictors. With increasing pressure on the airlines to deliver safe and reliable flights for their passengers as a result of expanded passenger rights rules (Ali et al 2024), it is critical now more than ever for airlines to be able to minimize disruptions to their flights as much as possible to prevent unnecessary losses. Having the ability to predict potential delays would enable airlines to proactively manage their operations by reallocating resources or adjusting schedules in anticipation of delays, in turn improving efficiency and customer satisfaction. The integration of predictive analytics in the aviation industry has the potential to significantly minimize disruptions, optimize performance, and provide a smoother, more reliable travel experience for all stakeholders involved. 
 
 This project aims to develop a predictive model to forecast whether or not a flight will be delayed using individual flight data, including identifying the key factors contributing to delays and providing actionable insights to stakeholders to improve operational efficiency and customer satisfaction. 
 
-### Data
+## Data
 The data obtained for this project comes from the United States Department of Transportation and was downloaded and collated by a user on Kaggle (Mu 2019 & OST_R: BTS: Transtats). Each data set contains information on individual flights from 2008-2018, with each year in its own data set. Some of the variables include flight origin, flight destination, departure and arrival times, whether the flight was delayed or cancelled, length of delay, reason for a cancellation or delay, and many more. In total, each data set has 28 variables. The primary focus will be on the most recent three years available (2016-2018), however additional years’ data will be utilized if need be. In addition, data from more recent years might be sought out if deemed necessary as the investigation progresses.
 
-# 
+## References
+Ali, A., Sweeny, S., & Hensley, S. B. (2024, April 24). Airlines required to refund passengers for canceled, delayed flights [Review of Airlines required to refund passengers for canceled, delayed flights]. ABC News. https://abcnews.go.com/Politics/airlines-give-automatic-refunds-canceled-flights-delayed-3/story?id=109573733
+
+Anupkumar, Ashmith, “Investigating the Costs and Economic Impact of Flight Delays in the Aviation Industry and the Potential Strategies for Reduction" (2023). Electronic Theses, Projects, and Dissertations. 1653. https://scholarworks.lib.csusb.edu/etd/1653
+Federal Aviation Administration. (2024). https://www.faa.gov/ 
+
+OST_R: BTS: Transtats. Bureau of Transportation Statistics. (n.d.). https://www.transtats.bts.gov/Homepage.asp 
+
+Mu, Y. (2019). Airline Delay and Cancellation Data, 2009 - 2018. Kaggle. https://www.kaggle.com/datasets/yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018?select=2016.csv  
+
